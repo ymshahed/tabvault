@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TabVault Local</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">TABVAULT LOCAL</p>
+        <h1>Your browser, backed up.</h1>
+      </div>
+      <button id="settingsButton" class="icon-button" title="Settings" aria-label="Settings">
+        <img src="logo.svg" alt="">
+      </button>
+    </header>
+
+    <section class="hero">
+      <p>Save a safe local snapshot before your tabs disappear.</p>
+      <div class="actions">
+        <button id="saveButton" class="primary">Save current session</button>
+        <button id="saveTabButton" class="secondary">Save current tab</button>
+        <button id="exportButton" class="secondary">Export current window</button>
+      </div>
+      <label class="toggle-row">
+        <input id="automaticToggle" type="checkbox">
+        <span>Automatic local snapshots</span>
+      </label>
+    </section>
+
+    <section class="toolbar">
+      <label class="search">
+        <span aria-hidden="true">⌕</span>
+        <input id="searchInput" type="search" placeholder="Search sessions, URLs, domains..." aria-label="Search sessions">
+      </label>
+      <button id="importButton" class="secondary small">Import backup</button>
+      <input id="fileInput" type="file" accept=".json,application/json,text/plain,*/*" hidden>
+    </section>
+    <div class="folder-bar">
+      <label for="folderFilter">Save/view folder</label>
+      <select id="folderFilter"></select>
+      <button id="openSettingsButton" class="link-button">Manage folders</button>
+    </div>
+    <p class="folder-help">New tabs and sessions are saved in the selected folder. “All folders” shows every saved item.</p>
+    <div class="bulk-bar">
+      <label><input id="selectAllCheckbox" type="checkbox"> Select visible</label>
+      <button id="deleteSelectedButton" class="secondary small" disabled>Delete selected</button>
+    </div>
+
+    <p id="status" class="status" role="status"></p>
+    <section id="sessionList" class="session-list" aria-live="polite"></section>
+    <p class="privacy">Local only. Tab URLs never leave this browser.</p>
+  </main>
+  <dialog id="restoreDialog">
+    <form method="dialog" class="restore-card">
+      <h2>Restore saved tabs</h2>
+      <p>Where should TabVault open these saved tabs?</p>
+      <div class="restore-actions">
+        <button value="current-window" class="primary">This window</button>
+        <button value="new-window" class="secondary">New window</button>
+        <button value="cancel" class="link-button">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="popup.js"></script>
+</body>
+</html>

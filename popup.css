@@ -1,0 +1,66 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ink: #17212b;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --soft: #f8fafc;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; width: 410px; color: var(--ink); background: white; }
+main { padding: 18px; }
+header, .actions, .toolbar, .toggle-row, .session-heading, .session-meta, .session-actions {
+  display: flex;
+  align-items: center;
+}
+header { justify-content: space-between; margin-bottom: 16px; }
+.eyebrow { margin: 0 0 5px; color: var(--blue); font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+h1 { margin: 0; font-size: 21px; letter-spacing: -.03em; }
+button { border: 0; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 700; }
+button:focus-visible, input:focus-visible { outline: 3px solid #bfdbfe; outline-offset: 2px; }
+.icon-button { padding: 7px 9px; color: var(--muted); background: var(--soft); font-size: 17px; }
+.icon-button img { display: block; width: 22px; height: 22px; }
+.hero { padding: 15px; border: 1px solid #dbeafe; border-radius: 12px; background: #eff6ff; }
+.hero p { margin: 0 0 13px; font-size: 13px; line-height: 1.45; }
+.actions { gap: 8px; flex-wrap: wrap; }
+.primary { padding: 10px 12px; color: white; background: var(--blue); }
+.primary:hover { background: var(--blue-dark); }
+.secondary { padding: 10px 12px; color: #334155; background: white; border: 1px solid var(--line); }
+.small { padding: 8px 10px; font-size: 12px; }
+.toggle-row { gap: 8px; margin-top: 13px; color: #475569; font-size: 12px; }
+.toggle-row input { accent-color: var(--blue); }
+.toolbar { gap: 8px; margin: 15px 0 9px; }
+.bulk-bar { display: flex; align-items: center; justify-content: space-between; margin: 0 0 7px; color: var(--muted); font-size: 11px; }
+.bulk-bar label { display: flex; align-items: center; gap: 6px; }
+.bulk-bar input { accent-color: var(--blue); }
+.bulk-bar button:disabled { cursor: not-allowed; opacity: .5; }
+.folder-bar { display: flex; align-items: center; gap: 8px; margin: 5px 0 10px; color: var(--muted); font-size: 11px; }
+.folder-bar select { min-width: 115px; padding: 6px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: white; font: inherit; }
+.folder-help { margin: -5px 0 10px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+.link-button { padding: 0; color: var(--blue); background: transparent; font-size: 11px; }
+.search { display: flex; flex: 1; align-items: center; gap: 7px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); }
+.search input { width: 100%; border: 0; outline: 0; font: inherit; font-size: 12px; }
+.status { min-height: 18px; margin: 5px 0; color: #166534; font-size: 12px; }
+.status.error { color: #b91c1c; }
+.session-list { max-height: 320px; overflow-y: auto; }
+.empty { padding: 24px 12px; color: var(--muted); text-align: center; font-size: 13px; }
+.session { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.session-heading { gap: 8px; }
+.record-checkbox { flex: 0 0 auto; accent-color: var(--blue); }
+.session-heading .session-name { flex: 1; }
+.session-name { overflow: hidden; font-size: 13px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+.badge { flex: 0 0 auto; padding: 3px 6px; border-radius: 99px; color: #475569; background: #f1f5f9; font-size: 10px; }
+.session-meta { gap: 9px; margin: 6px 0 9px; color: var(--muted); font-size: 11px; }
+.session-actions { gap: 6px; }
+.session-actions button { padding: 6px 8px; color: #334155; background: var(--soft); font-size: 11px; }
+.session-actions .delete-button { color: #b91c1c; }
+.privacy { margin: 14px 0 0; color: var(--muted); text-align: center; font-size: 10px; }
+dialog { padding: 0; border: 0; border-radius: 12px; box-shadow: 0 16px 40px #0f172a33; }
+dialog::backdrop { background: #0f172a55; }
+.restore-card { width: 300px; padding: 20px; }
+.restore-card h2 { margin: 0 0 8px; font-size: 17px; }
+.restore-card p { margin: 0 0 16px; color: var(--muted); font-size: 12px; }
+.restore-actions { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }

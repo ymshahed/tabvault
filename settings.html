@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TabVault Local Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <main>
+    <header>
+      <img src="logo.svg" alt="" class="logo">
+      <div>
+        <p class="eyebrow">TABVAULT LOCAL</p>
+        <h1>Settings</h1>
+      </div>
+    </header>
+    <section class="card">
+      <h2>Automatic snapshots</h2>
+      <label class="toggle"><input id="automaticToggle" type="checkbox"><span>Save local snapshots when tabs change</span></label>
+      <p class="hint">Snapshots stay in this browser. Export a backup if you are moving or resetting Chrome.</p>
+    </section>
+    <section class="card">
+      <h2>Backup folders</h2>
+      <p class="hint">Create folders to organize saved sessions and tabs. Folder data is stored locally.</p>
+      <form id="folderForm" class="create-row">
+        <input id="folderName" required maxlength="40" placeholder="New folder name" aria-label="New folder name">
+        <button class="primary" type="submit">Create folder</button>
+      </form>
+      <div id="folderList"></div>
+    </section>
+    <p id="status" role="status"></p>
+  </main>
+  <script src="settings.js"></script>
+</body>
+</html>
