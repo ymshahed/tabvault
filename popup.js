@@ -61,8 +61,9 @@ async function saveCurrentTab() {
 
 function getSaveFolderId() {
   const selectedFolderId = $("#folderFilter").value;
-  return state?.folders.some((folder) => folder.id === selectedFolderId)
-    ? selectedFolderId
+  if (state?.folders.some((folder) => folder.id === selectedFolderId)) return selectedFolderId;
+  return state?.folders.some((folder) => folder.id === state.settings.defaultFolderId)
+    ? state.settings.defaultFolderId
     : "general";
 }
 

@@ -12,8 +12,14 @@ h1 { font-size: 28px; } h2 { font-size: 17px; }
 .toggle { margin-top: 16px; font-size: 14px; } input[type=checkbox] { accent-color: #2563eb; }
 .hint { color: #64748b; font-size: 13px; line-height: 1.5; }
 .create-row { margin-top: 18px; } input[type=text], input:not([type]) { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
-button { padding: 10px 13px; border: 0; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 700; }
+button, select { padding: 10px 13px; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 700; background: white; }
 .primary { color: white; background: #2563eb; }
+.secondary { margin: 12px 8px 0 0; color: #334155; background: #f1f5f9; }
+.danger { margin: 12px 8px 0 0; color: #b91c1c; background: #fff1f2; border-color: #fecdd3; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; color: #334155; font-size: 13px; }
+.setting-row select { min-width: 180px; }
+#defaultFolder { width: 100%; margin-top: 14px; }
+.summary, .version { color: #475569; font-size: 13px; }
 .folder-row { justify-content: space-between; padding: 13px 0; border-top: 1px solid #e2e8f0; }
 .folder-name { font-weight: 650; } .folder-actions { display: flex; gap: 6px; }
 .folder-actions button { padding: 7px 9px; color: #334155; background: #f1f5f9; font-size: 12px; }
