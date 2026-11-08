@@ -1,16 +1,18 @@
 const STORAGE_KEY = "tabVaultState";
 const CURRENT_SCHEMA = 2;
-const MAX_AUTOMATIC_SNAPSHOTS = 5;
+const DEFAULT_SNAPSHOT_INTERVAL_MINUTES = 30;
+const DEFAULT_MAX_AUTOMATIC_SNAPSHOTS = 5;
 const SNAPSHOT_DEBOUNCE_MS = 1500;
 let snapshotTimer;
 
 chrome.runtime.onInstalled.addListener(async () => {
   await ensureState();
-  await chrome.alarms.create("tabvault-periodic-snapshot", { periodInMinutes: 30 });
+  await scheduleSnapshotAlarm();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   await ensureState();
+  await scheduleSnapshotAlarm();
   await createAutomaticSnapshot("browser-start");
 });
 
@@ -54,15 +56,32 @@ function emptyState() {
     sessions: [],
     automaticSnapshots: [],
     folders: [{ id: "general", name: "General" }],
-    settings: { automaticSnapshots: true }
+    settings: {
+      automaticSnapshots: true,
+      snapshotIntervalMinutes: DEFAULT_SNAPSHOT_INTERVAL_MINUTES,
+      maxAutomaticSnapshots: DEFAULT_MAX_AUTOMATIC_SNAPSHOTS,
+      defaultFolderId: "general"
+    }
   };
+}
+
+async function scheduleSnapshotAlarm() {
+  const state = await readState();
+  await chrome.alarms.clear("tabvault-periodic-snapshot");
+  if (state.settings.automaticSnapshots !== false) {
+    await chrome.alarms.create("tabvault-periodic-snapshot", {
+      periodInMinutes: state.settings.snapshotIntervalMinutes
+    });
+  }
 }
 
 async function readState() {
   await ensureState();
   const result = await chrome.storage.local.get(STORAGE_KEY);
   const migrated = migrateState(result[STORAGE_KEY]);
-  await writeState(migrated);
+  if (JSON.stringify(result[STORAGE_KEY]) !== JSON.stringify(migrated)) {
+    await writeState(migrated);
+  }
   return migrated;
 }
 
@@ -101,7 +120,16 @@ function migrateState(value) {
       : [],
     folders,
     settings: {
-      automaticSnapshots: value.settings?.automaticSnapshots !== false
+      automaticSnapshots: value.settings?.automaticSnapshots !== false,
+      snapshotIntervalMinutes: [15, 30, 60].includes(Number(value.settings?.snapshotIntervalMinutes))
+        ? Number(value.settings.snapshotIntervalMinutes)
+        : DEFAULT_SNAPSHOT_INTERVAL_MINUTES,
+      maxAutomaticSnapshots: [5, 10, 20].includes(Number(value.settings?.maxAutomaticSnapshots))
+        ? Number(value.settings.maxAutomaticSnapshots)
+        : DEFAULT_MAX_AUTOMATIC_SNAPSHOTS,
+      defaultFolderId: folders.some((folder) => folder.id === value.settings?.defaultFolderId)
+        ? value.settings.defaultFolderId
+        : "general"
     }
   };
 }
@@ -208,7 +236,7 @@ async function saveCurrentSession(type, name, folderId = "general") {
   const record = createRecord(windows, type, name, targetFolderId);
   if (type === "automatic") {
     state.automaticSnapshots = [record, ...state.automaticSnapshots]
-      .slice(0, MAX_AUTOMATIC_SNAPSHOTS);
+      .slice(0, state.settings.maxAutomaticSnapshots);
   } else {
     state.sessions = [record, ...state.sessions];
   }
@@ -317,7 +345,35 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const state = await readState();
       state.settings.automaticSnapshots = Boolean(message.enabled);
       await writeState(state);
+      await scheduleSnapshotAlarm();
       sendResponse({ ok: true });
+    } else if (message.type === "set-snapshot-settings") {
+      const state = await readState();
+      const interval = Number(message.intervalMinutes);
+      const maximum = Number(message.maxSnapshots);
+      if (![15, 30, 60].includes(interval)) throw new Error("Unsupported snapshot interval.");
+      if (![5, 10, 20].includes(maximum)) throw new Error("Unsupported snapshot limit.");
+      state.settings.snapshotIntervalMinutes = interval;
+      state.settings.maxAutomaticSnapshots = maximum;
+      state.automaticSnapshots = state.automaticSnapshots.slice(0, maximum);
+      await writeState(state);
+      await scheduleSnapshotAlarm();
+      sendResponse({ ok: true, state });
+    } else if (message.type === "set-default-folder") {
+      const state = await readState();
+      if (!state.folders.some((folder) => folder.id === message.folderId)) throw new Error("Folder not found.");
+      state.settings.defaultFolderId = message.folderId;
+      await writeState(state);
+      sendResponse({ ok: true, state });
+    } else if (message.type === "delete-automatic-snapshots") {
+      const state = await readState();
+      state.automaticSnapshots = [];
+      await writeState(state);
+      sendResponse({ ok: true, state });
+    } else if (message.type === "clear-local-data") {
+      await chrome.storage.local.set({ [STORAGE_KEY]: emptyState() });
+      await scheduleSnapshotAlarm();
+      sendResponse({ ok: true, state: emptyState() });
     } else if (message.type === "replace-state") {
       const migrated = migrateState(message.state);
       await writeState(migrated);

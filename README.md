@@ -30,6 +30,8 @@ TabVault Local is a privacy-first Chrome extension for saving and restoring brow
 - Rename saved sessions and tabs.
 - Select and delete multiple saved items at once, including all currently visible search results.
 - Dedicated Settings page for automatic snapshots and folders.
+- Settings include snapshot frequency/retention, default save folder, full local export, storage summary, privacy information, and guarded clear-data controls.
+- The Settings page updates live when sessions or tabs are saved from the dashboard, so its counts and exports use current local data.
 - Delete individual snapshots.
 - Automatic snapshot toggle.
 - Restricted browser URLs are stored for reference but skipped during restore.
