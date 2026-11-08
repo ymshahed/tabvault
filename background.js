@@ -75,11 +75,29 @@ function migrateState(value) {
     ...record,
     folderId: folders.some((folder) => folder.id === record.folderId) ? record.folderId : "general"
   });
+  const normalizeAutomaticRecord = (record) => {
+    const windows = Array.isArray(record.windows)
+      ? record.windows.map((window) => ({
+        ...window,
+        tabs: Array.isArray(window.tabs) ? window.tabs.filter((tab) => isRestorableUrl(tab.url)) : []
+      })).filter((window) => window.tabs.length > 0)
+      : [];
+    if (!windows.length) return null;
+    const tabs = windows.flatMap((window) => window.tabs);
+    return {
+      ...record,
+      windows,
+      windowCount: windows.length,
+      tabCount: tabs.length,
+      domains: [...new Set(tabs.map((tab) => getDomain(tab.url)).filter(Boolean))].sort(),
+      folderId: folders.some((folder) => folder.id === record.folderId) ? record.folderId : "general"
+    };
+  };
   return {
     schemaVersion: CURRENT_SCHEMA,
     sessions: Array.isArray(value.sessions) ? value.sessions.map(normalizeRecord) : [],
     automaticSnapshots: Array.isArray(value.automaticSnapshots)
-      ? value.automaticSnapshots.map(normalizeRecord)
+      ? value.automaticSnapshots.map(normalizeRecord).map(normalizeAutomaticRecord).filter(Boolean)
       : [],
     folders,
     settings: {
@@ -215,7 +233,12 @@ async function saveCurrentTab(name, folderId = "general") {
 async function createAutomaticSnapshot(reason) {
   const state = await readState();
   if (state.settings.automaticSnapshots === false) return null;
-  const windows = await getBrowserSnapshot();
+  const windows = (await getBrowserSnapshot())
+    .map((window) => ({
+      ...window,
+      tabs: window.tabs.filter((tab) => isRestorableUrl(tab.url))
+    }))
+    .filter((window) => window.tabs.length > 0);
   if (!windows.some((window) => window.tabs.length > 0)) return null;
   const latest = state.automaticSnapshots[0];
   const currentSignature = JSON.stringify(windows);

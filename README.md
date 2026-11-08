@@ -15,6 +15,7 @@ TabVault Local is a privacy-first Chrome extension for saving and restoring brow
 - Manual local session save.
 - Save the currently active tab as its own saved item.
 - Automatic snapshots with a five-snapshot retention limit.
+- Automatic snapshots keep only tabs that Chrome allows the extension to reopen.
 - Search saved names as you type; name matches are prioritized, and tab titles, URLs, and domains are searched only when no saved name matches.
 - Safe restore into new windows.
 - JSON backup export and validated import.
