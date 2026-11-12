@@ -35,6 +35,10 @@ const scheduleSnapshot = (reason) => {
 
 chrome.tabs.onCreated.addListener(() => scheduleSnapshot("tab-created"));
 chrome.tabs.onRemoved.addListener(() => scheduleSnapshot("tab-removed"));
+chrome.tabs.onActivated.addListener(() => scheduleSnapshot("tab-activated"));
+chrome.tabs.onMoved.addListener(() => scheduleSnapshot("tab-moved"));
+chrome.tabs.onAttached.addListener(() => scheduleSnapshot("tab-attached"));
+chrome.tabs.onDetached.addListener(() => scheduleSnapshot("tab-detached"));
 chrome.tabs.onUpdated.addListener((_tabId, changeInfo) => {
   if (changeInfo.url || changeInfo.title || changeInfo.status === "complete") {
     scheduleSnapshot("tab-updated");
@@ -42,6 +46,7 @@ chrome.tabs.onUpdated.addListener((_tabId, changeInfo) => {
 });
 chrome.windows.onCreated.addListener(() => scheduleSnapshot("window-created"));
 chrome.windows.onRemoved.addListener(() => scheduleSnapshot("window-removed"));
+chrome.windows.onFocusChanged.addListener(() => scheduleSnapshot("window-focused"));
 
 async function ensureState() {
   const result = await chrome.storage.local.get(STORAGE_KEY);
@@ -268,9 +273,9 @@ async function createAutomaticSnapshot(reason) {
     }))
     .filter((window) => window.tabs.length > 0);
   if (!windows.some((window) => window.tabs.length > 0)) return null;
-  const latest = state.automaticSnapshots[0];
   const currentSignature = JSON.stringify(windows);
-  if (latest && JSON.stringify(latest.windows) === currentSignature) return latest;
+  const latest = state.automaticSnapshots[0];
+  if (reason !== "scheduled" && latest && JSON.stringify(latest.windows) === currentSignature) return latest;
   return saveCurrentSession("automatic", `Automatic backup (${reason})`);
 }
 
@@ -371,9 +376,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       await writeState(state);
       sendResponse({ ok: true, state });
     } else if (message.type === "clear-local-data") {
-      await chrome.storage.local.set({ [STORAGE_KEY]: emptyState() });
+      const state = await readState();
+      state.sessions = [];
+      state.automaticSnapshots = [];
+      await writeState(state);
       await scheduleSnapshotAlarm();
-      sendResponse({ ok: true, state: emptyState() });
+      sendResponse({ ok: true, state });
     } else if (message.type === "replace-state") {
       const migrated = migrateState(message.state);
       await writeState(migrated);

@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelector("#folderForm").addEventListener("submit", createFolder);
   document.querySelector("#automaticToggle").addEventListener("change", toggleAutomatic);
   document.querySelector("#saveSnapshotSettings").addEventListener("click", saveSnapshotSettings);
+  document.querySelector("#snapshotInterval").addEventListener("change", saveSnapshotSettings);
+  document.querySelector("#snapshotLimit").addEventListener("change", saveSnapshotSettings);
   document.querySelector("#deleteAutomaticButton").addEventListener("click", deleteAutomaticSnapshots);
   document.querySelector("#defaultFolder").addEventListener("change", changeDefaultFolder);
   document.querySelector("#clearDataButton").addEventListener("click", clearLocalData);
@@ -14,6 +16,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === "local" && changes.tabVaultState) {
     load();
+  }
+
+  function showControlStatus(id, message, error = false) {
+    const status = document.querySelector(`#${id}`);
+    if (!status) return;
+    status.textContent = message;
+    status.classList.toggle("error", error);
   }
 });
 
@@ -36,6 +45,8 @@ async function load() {
 }
 
 async function saveSnapshotSettings() {
+  const button = document.querySelector("#saveSnapshotSettings");
+  button.disabled = true;
   try {
     state = (await send({
       type: "set-snapshot-settings",
@@ -43,8 +54,18 @@ async function saveSnapshotSettings() {
       maxSnapshots: document.querySelector("#snapshotLimit").value
     })).state;
     renderSummary();
-    showStatus("Snapshot settings saved.");
-  } catch (error) { showStatus(error.message, true); }
+    showSnapshotStatus("Settings saved.");
+  } catch (error) {
+    showSnapshotStatus(`Could not save snapshot settings: ${error.message}`, true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function showSnapshotStatus(message, error = false) {
+  const status = document.querySelector("#snapshotSettingsStatus");
+  status.textContent = message;
+  status.classList.toggle("error", error);
 }
 
 async function deleteAutomaticSnapshots() {
@@ -52,25 +73,28 @@ async function deleteAutomaticSnapshots() {
   try {
     state = (await send({ type: "delete-automatic-snapshots" })).state;
     renderSummary();
-    showStatus("Automatic snapshots deleted.");
-  } catch (error) { showStatus(error.message, true); }
+    showControlStatus("deleteAutomaticStatus", "Automatic snapshots deleted.");
+  } catch (error) { showControlStatus("deleteAutomaticStatus", error.message, true); }
 }
 
 async function changeDefaultFolder(event) {
   try {
     state = (await send({ type: "set-default-folder", folderId: event.target.value })).state;
-    showStatus("Default folder saved.");
+    showControlStatus("defaultFolderStatus", "Default folder saved.");
   } catch (error) {
     renderDefaultFolder();
-    showStatus(error.message, true);
+    showControlStatus("defaultFolderStatus", error.message, true);
   }
 }
 
 async function toggleAutomatic(event) {
   try {
     await send({ type: "set-automatic-snapshots", enabled: event.target.checked });
-    showStatus("Settings saved.");
-  } catch (error) { event.target.checked = !event.target.checked; showStatus(error.message, true); }
+    showControlStatus("automaticStatus", "Settings saved.");
+  } catch (error) {
+    event.target.checked = !event.target.checked;
+    showControlStatus("automaticStatus", error.message, true);
+  }
 }
 
 async function createFolder(event) {
@@ -81,8 +105,8 @@ async function createFolder(event) {
     document.querySelector("#folderName").value = "";
     renderFolders();
     renderDefaultFolder();
-    showStatus("Folder created.");
-  } catch (error) { showStatus(error.message, true); }
+    showControlStatus("folderStatus", "Folder created.");
+  } catch (error) { showControlStatus("folderStatus", error.message, true); }
 }
 
 function renderFolders() {
@@ -110,8 +134,8 @@ async function folderAction(action, id) {
     renderFolders();
       renderDefaultFolder();
       renderSummary();
-      showStatus("Folder updated.");
-  } catch (error) { showStatus(error.message, true); }
+      showControlStatus("folderStatus", "Folder updated.");
+  } catch (error) { showControlStatus("folderStatus", error.message, true); }
 }
 
 function renderDefaultFolder() {
@@ -128,7 +152,7 @@ function renderSummary() {
 }
 
 async function clearLocalData() {
-  if (!confirm("Clear all saved tabs, sessions, folders, and settings? Export a backup first if you may need this data.")) return;
+  if (!confirm("Delete all saved tabs, sessions, and automatic snapshots? Your folders and settings will be kept.")) return;
   try {
     state = (await send({ type: "clear-local-data" })).state;
     document.querySelector("#automaticToggle").checked = state.settings.automaticSnapshots;
@@ -137,8 +161,8 @@ async function clearLocalData() {
     renderFolders();
     renderDefaultFolder();
     renderSummary();
-    showStatus("All local data was cleared.");
-  } catch (error) { showStatus(error.message, true); }
+    showControlStatus("clearDataStatus", "Saved data cleared. Folders and settings were kept.");
+  } catch (error) { showControlStatus("clearDataStatus", error.message, true); }
 }
 
 async function exportBackup() {
@@ -164,8 +188,8 @@ async function exportBackup() {
       conflictAction: "uniquify"
     });
     if (!downloadId) throw new Error("Chrome could not start the file save dialog.");
-    showStatus("Choose where to save the backup file.");
-  } catch (error) { showStatus(`Export failed: ${error.message}`, true); }
+    showControlStatus("exportStatus", "Choose where to save the backup file.");
+  } catch (error) { showControlStatus("exportStatus", `Export failed: ${error.message}`, true); }
 }
 
 function ensureJsonExtension(filename) {

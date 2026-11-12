@@ -13,9 +13,18 @@ h1 { font-size: 28px; } h2 { font-size: 17px; }
 .hint { color: #64748b; font-size: 13px; line-height: 1.5; }
 .create-row { margin-top: 18px; } input[type=text], input:not([type]) { flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
 button, select { padding: 10px 13px; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font: inherit; font-weight: 700; background: white; }
+button:disabled { cursor: wait; opacity: .65; }
 .primary { color: white; background: #2563eb; }
 .secondary { margin: 12px 8px 0 0; color: #334155; background: #f1f5f9; }
 .danger { margin: 12px 8px 0 0; color: #b91c1c; background: #fff1f2; border-color: #fecdd3; }
+.snapshot-actions { display: flex; align-items: flex-start; gap: 8px; margin-top: 6px; }
+.snapshot-save { display: flex; flex-direction: column; align-items: flex-start; }
+.snapshot-delete { display: flex; flex-direction: column; align-items: flex-start; }
+.snapshot-actions .secondary, .snapshot-actions .danger { margin-top: 12px; }
+.save-status { min-height: 20px; margin: 4px 0 0 13px; color: #166534; font-size: 13px; }
+.save-status.error { color: #b91c1c; }
+.control-status { min-height: 20px; margin: 4px 0 0; color: #166534; font-size: 13px; }
+.control-status.error { color: #b91c1c; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; color: #334155; font-size: 13px; }
 .setting-row select { min-width: 180px; }
 #defaultFolder { width: 100%; margin-top: 14px; }

@@ -18,6 +18,7 @@
     <section class="card">
       <h2>Automatic snapshots</h2>
       <label class="toggle"><input id="automaticToggle" type="checkbox"><span>Save local snapshots when tabs change</span></label>
+      <p id="automaticStatus" class="control-status" role="status"></p>
       <p class="hint">Snapshots stay in this browser. Export a backup if you are moving or resetting Chrome.</p>
       <div class="setting-row">
         <label for="snapshotInterval">Snapshot frequency</label>
@@ -35,13 +36,22 @@
           <option value="20">Keep 20</option>
         </select>
       </div>
-      <button id="saveSnapshotSettings" class="secondary" type="button">Save snapshot settings</button>
-      <button id="deleteAutomaticButton" class="danger" type="button">Delete automatic snapshots</button>
+      <div class="snapshot-actions">
+        <div class="snapshot-save">
+          <button id="saveSnapshotSettings" class="secondary" type="button">Save snapshot settings</button>
+          <p id="snapshotSettingsStatus" class="save-status" role="status"></p>
+        </div>
+        <div class="snapshot-delete">
+          <button id="deleteAutomaticButton" class="danger" type="button">Delete automatic snapshots</button>
+          <p id="deleteAutomaticStatus" class="save-status" role="status"></p>
+        </div>
+      </div>
     </section>
     <section class="card">
       <h2>Default save folder</h2>
       <p class="hint">New saves use this folder when no folder is selected in the dashboard.</p>
       <select id="defaultFolder"></select>
+      <p id="defaultFolderStatus" class="control-status" role="status"></p>
     </section>
     <section class="card">
       <h2>Backup folders</h2>
@@ -50,6 +60,7 @@
         <input id="folderName" required maxlength="40" placeholder="New folder name" aria-label="New folder name">
         <button class="primary" type="submit">Create folder</button>
       </form>
+      <p id="folderStatus" class="control-status" role="status"></p>
       <div id="folderList"></div>
     </section>
     <section class="card">
@@ -57,11 +68,13 @@
       <p class="hint">Your tab data is stored locally in Chrome. Tab URLs are not sent to a server.</p>
       <p id="storageSummary" class="summary"></p>
       <button id="clearDataButton" class="danger" type="button">Clear all local data</button>
+      <p id="clearDataStatus" class="control-status" role="status"></p>
     </section>
     <section class="card">
       <h2>Backup and support</h2>
       <p class="hint">Export a complete local backup before moving or resetting Chrome.</p>
       <button id="exportBackupButton" class="secondary" type="button">Export all data</button>
+      <p id="exportStatus" class="control-status" role="status"></p>
       <p class="hint">TabVault Local is beta software. Report problems through the support email listed in the store listing.</p>
       <p class="version">Version 0.1.2</p>
     </section>
